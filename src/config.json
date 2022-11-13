@@ -3,7 +3,7 @@
     "wininfo": [],
     "wintype": 1,
     "events": {
-        "names": [],
-        "times": []
+        "names": ["test"],
+        "times": ["23:59:59"]
     }
 }
