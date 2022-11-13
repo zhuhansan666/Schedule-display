@@ -1,2 +1,3 @@
 make:
-	python make.py
+#	python make.py
+	pyinstaller ./src/main.spec
