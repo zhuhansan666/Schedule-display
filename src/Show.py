@@ -366,5 +366,5 @@ if __name__ == '__main__':
     # print(dic)
     global_obj.config_dict["events"] = dic
 
-    test = ShowUI(app_config, global_obj, r"./static.dis/MiSans-Bold.ttf")
+    test = ShowUI(app_config, global_obj, r"./static/MiSans-Bold.ttf")
     test.mainloop(True)
