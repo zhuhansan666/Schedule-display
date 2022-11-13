@@ -2,7 +2,7 @@ from src.Show import ShowUI
 from src.g import app_config, global_obj
 from src.pkg.staticTools import ThreadErr
 
-from src.Version import VERSION
+from src.Version import VERSION, VERSION_TYPE
 
 from time import sleep, time
 from logging import getLogger
@@ -48,7 +48,7 @@ sys.excepthook = error
 
 if __name__ == '__main__':
     str_version = (str(n) for n in VERSION)
-    print("Welcome to ues the 日程显示 by 爱喝牛奶 (Ver={})".format(".".join(str_version)))
+    print("Welcome to ues the 日程显示 by 爱喝牛奶 (Ver={}-{})".format(VERSION_TYPE, ".".join(str_version)))
     show_ui = ShowUI(app_config, global_obj, r"./static/MiSans-Bold.ttf")
     main = Main(app_config, global_obj, show_ui)
     main.main()
