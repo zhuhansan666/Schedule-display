@@ -53,6 +53,5 @@ if __name__ == '__main__':
     str_version = (str(n) for n in VERSION)
     print("Welcome to ues the 日程显示 by 爱喝牛奶 (Ver={}-{})".format(VERSION_TYPE, ".".join(str_version)))
     show_ui = ShowUI(app_config, global_obj, r"./static/MiSans-Bold.ttf")
-    print(global_obj.config_dict)
     main = Main(app_config, global_obj, show_ui)
     main.main()
