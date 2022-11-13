@@ -41,7 +41,7 @@ class Format:
 
         low_timestamp = -1
         result_index = -1
-        for index in range(min(len(names), len(times)) - 1):
+        for index in range(min(len(names), len(times))):  # 为了时间戳在只有一个项获取正常, 此处不减一
             time_stamp2 = -1
             try:
                 if mate_date:
@@ -293,7 +293,6 @@ class ShowUI:
 
     def resort(self):
         if self.control_power == 0:
-            # self.__global.update_config()
             result = Format.sort(self.__global.config_dict.get("events", {"names": [], "times": []}), time())
             if result[0] is not True:
                 low_err = self.__errors.get("format", [False, -1, 0])
@@ -316,7 +315,7 @@ class ShowUI:
                         get_index(self.__global.config_dict["events"].get("names", []), result[1], ""),  # 名称
                         result[2]  # 时间戳
                     ]  # 事件名, 事件时间戳
-                except IndexError:
+                except IndexError as e:
                     pass
                 except Exception as e:
                     logger.error("读取配置发生错误:", exc_info=e)
