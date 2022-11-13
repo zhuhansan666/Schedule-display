@@ -280,16 +280,18 @@ class ThreadErr(Thread):
     self.error -> 错误Obj
     """
 
-    def __init__(self, func, error_func=None, default_result=None, default_error=None, errorfunc_argvs=(), **kwargs):
+    def __init__(self, func, error_func=None, default_result=None, default_error=None, errorfunc_argvs=(),
+                 daemon: bool = False, **kwargs):
         """
         :param func: 运行的函数
         :param func_argvs: 函数的参数
         :param error_func: 发生错误时执行的函数 (会将e传入[以kwargs的"exc_info"项传入])
         :param default_result: 默认的self.result内容
         :param default_error: 默认的self.error内容
+        :param daemon: bool, 详见python threading.Thread文档
         :param kwargs: 字典参数, 详见python threading.Thread文档
         """
-        super().__init__(**kwargs)
+        super().__init__(daemon=daemon, **kwargs)
 
         self.__func = func
         self.__error_func = error_func
