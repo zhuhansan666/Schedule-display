@@ -1,1 +1,3 @@
-VERSION = (1, 0, 0, 20221113_113600)
+from time import time
+
+VERSION = (1, 0, 0, time())
