@@ -178,6 +178,21 @@ class ShowUI:
         except Exception as e:
             return False, e
 
+    @staticmethod
+    def set_pos(hwnd: int, pos: list | tuple):
+        try:
+            result = win32gui.SetWindowPos(hwnd, None,
+                                           *pos, 0, 0,
+                                           win32con.SWP_SHOWWINDOW | win32con.SWP_NOSIZE | win32con.SWP_NOACTIVATE)
+            """win32con.SWP_NOSIZE -> 忽略更改的窗口大小;  win32con.SWP_NOMOVE -> 忽略更改的窗口位置;
+            win32con.SWP_NOACTIVATE -> 默认不激活窗口"""
+            if result != 0:
+                return True, None
+            else:
+                return False, RuntimeError("Unknown Error")
+        except Exception as e:
+            return False, e
+
     # @staticmethod
     # def hide_background(hwnd: int):
     #     """
@@ -194,7 +209,7 @@ class ShowUI:
         self.stopped = False
         self.screen = None
 
-        self.set_font()
+        self.__set_font()
 
         self.__clock = pygame.time.Clock()
 
@@ -238,7 +253,7 @@ class ShowUI:
 
         pygame.display.flip()
 
-    def set_font(self):
+    def __set_font(self):
         lst = self.__fonts_size + list(self.__fonts_size_config.values())
         if os_path.splitext(self.__font_name)[1].lower() == ".ttf":  # 如果是.ttf文件
             for size in lst:
@@ -253,7 +268,7 @@ class ShowUI:
                 except Exception as e:
                     logger.error(f"加载系统字体 (大小: {size}) 发生错误:", exc_info=e)
 
-    def redraw(self):
+    def __redraw(self):
         time_differ = get_index(self.now_event, 1, 0) - time()
         name = get_index(self.now_event, 0, "")
         if self.now_event[1] > 0 and time_differ >= 0 and len(name) > 0:
@@ -291,7 +306,7 @@ class ShowUI:
             self.screen.blit(font_surface[0], (10 + self.pos[0], self.pos[1] + self.screen.get_size()[1] - 40 -
                                                font_surface[1][1]))
 
-    def resort(self):
+    def __resort(self):
         if self.control_power == 0:
             result = Format.sort(self.__global.config_dict.get("events", {"names": [], "times": []}), time())
             if result[0] is not True:
@@ -320,50 +335,68 @@ class ShowUI:
                 except Exception as e:
                     logger.error("读取配置发生错误:", exc_info=e)
 
-    def events(self, events_list: list):
+    def __events(self, events_list: list):
         for e in events_list:
             if e.type == pygame.QUIT:
                 self.stopped = True
                 pygame.quit()
                 sys_exit(0)
 
+    def __reset_pos(self):
+        wininfo: list = self.__config.get("wininfo", [])
+        if not len(wininfo) <= 0:
+            x, y, w, h = get_index(wininfo, 0, None), get_index(wininfo, 1, None), get_index(wininfo, 2, None), \
+                         get_index(wininfo, 3, None)
+        else:
+            x, y, w, h = app_config.default_wininfo
+
+        if all((x is not None, y is not None)):
+            environ["SDL_VIDEO_WINDOW_POS"] = f"{x},{y}"  # 设置弹出位置
+        result = self.set_pos(self.screen_hwnd, (x, y))
+        if result[0] is not True:
+            logger.error("重设置窗口位置发生错误:", exc_info=result[1])
+
     def mainloop(self, auto_exit: bool = False):
-        ThreadErr(self.resort, logger.error, errorfunc_argvs=("重新排序发生错误:", )).start()
+        ThreadErr(self.__resort, logger.error, errorfunc_argvs=("重新排序发生错误:",)).start()
         resort_time = time() - self.__app_config.resort_interval
+        reset_pos_time = time() - self.__app_config.reset_pos_interval
 
         while not self.stopped:
             self.__clock.tick(144)
             # print(self.__clock.get_fps())
 
             if abs(time() - resort_time) >= self.__app_config.resort_interval:
-                ThreadErr(self.resort, logger.error, errorfunc_argvs=("重新排序发生错误:", )).start()
+                ThreadErr(self.__resort, logger.error, errorfunc_argvs=("重新排序发生错误:",)).start()
                 resort_time = time()
+            if abs(time() - reset_pos_time) >= self.__app_config.reset_pos_interval:
+                ThreadErr(self.__reset_pos, logger.error, errorfunc_argvs=("重新设置窗口位置发生错误:",)).start()
+                reset_pos_time = time()
 
             self.screen.fill((0, 0, 0))
 
-            self.redraw()
+            self.__redraw()
 
             pygame.display.update()
             if not auto_exit:
                 pygame.event.get()
             else:
-                # ThreadErr(lambda: self.events(pygame.event.get()),
+                # ThreadErr(lambda: self.__events(pygame.event.get()),
                 #           logger.error, errorfunc_argvs=("读取事件/处理发生错误:", )).start()
                 try:
-                    self.events(pygame.event.get())
+                    self.__events(pygame.event.get())
                 except Exception as e:
                     logger.error("读取事件/处理发生错误:", exc_info=e)
 
 
 # test
 if __name__ == '__main__':
-    dic = {
-        "names": ["awa", "a", "", "测试"],
-        "times": ["18:00:03", "18:00:00", "18:17:50", "23:59:59"]
-    }
-    # print(Format.sort(dic, 0))
-    # print(dic)
-    global_obj.config_dict["events"] = dic
+    # dic = {
+    #     "names": ["awa", "a", "", "测试"],
+    #     "times": ["18:00:03", "18:00:00", "18:17:50", "23:59:59"]
+    # }
+    # # print(Format.sort(dic, 0))
+    # # print(dic)
+    # global_obj.config_dict["events"] = dic
 
     test = ShowUI(app_config, global_obj, r"./static/MiSans-Bold.ttf")
     test.mainloop(True)

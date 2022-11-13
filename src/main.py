@@ -37,11 +37,14 @@ class Main:
 
 
 def error(t, value, trace_back):
-    traceback_info = ""
-    for line in format_exception(t, value, trace_back):
-        traceback_info += str(line)
-    logger.error("主程序发生错误(sys.excepthook): {}".format(traceback_info))
-    sys.exit(-1)
+    if t != KeyboardInterrupt:
+        traceback_info = ""
+        for line in format_exception(t, value, trace_back):
+            traceback_info += str(line)
+        logger.error("主程序发生错误(sys.excepthook): {}".format(traceback_info))
+        sys.exit(-1)
+    else:
+        sys.exit(0)
 
 
 sys.excepthook = error
@@ -50,5 +53,6 @@ if __name__ == '__main__':
     str_version = (str(n) for n in VERSION)
     print("Welcome to ues the 日程显示 by 爱喝牛奶 (Ver={}-{})".format(VERSION_TYPE, ".".join(str_version)))
     show_ui = ShowUI(app_config, global_obj, r"./static/MiSans-Bold.ttf")
+    print(global_obj.config_dict)
     main = Main(app_config, global_obj, show_ui)
     main.main()

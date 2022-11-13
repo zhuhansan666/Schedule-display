@@ -12,7 +12,7 @@ class AppConfig:
             "font": "",
             "wininfo": [],
             "wintype": 1,
-            "events": {
+            "__events": {
                 "names": [],
                 "times": []
             }
@@ -31,6 +31,7 @@ class AppConfig:
         self.error_interval = 1  # 错误打印间隔, 秒
         self.max_error = 2  # 连续错误日志输出最大值
         self.resort_interval = 1  # 重新加载并排序间隔, 秒
+        self.reset_pos_interval = 0.01  # 重新更改窗口位置间隔, 秒
 
         self.time_units = {
             "日": 3600 * 24, "时": 3600, "分": 60, "秒": 1, "毫秒": 0.001

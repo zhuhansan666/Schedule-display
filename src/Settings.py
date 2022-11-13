@@ -15,12 +15,12 @@ class Manager:
         """
         result = [True, None, None]
         try:
-            self.__global.config_dict["events"]["names"].append(name)
+            self.__global.config_dict["__events"]["names"].append(name)
         except Exception as e:
             result[0] = False
             result[1] = e
         try:
-            self.__global.config_dict["events"]["times"].append(time)
+            self.__global.config_dict["__events"]["times"].append(time)
         except Exception as e:
             result[0] = False
             result[2] = e
@@ -33,8 +33,8 @@ class Manager:
         :return: True / False, None / err
         """
         try:
-            del self.__global.config_dict["events"]["names"][index]
-            del self.__global.config_dict["events"]["times"][index]
+            del self.__global.config_dict["__events"]["names"][index]
+            del self.__global.config_dict["__events"]["times"][index]
             return True, None
         except Exception as e:
             return False, e
@@ -49,9 +49,9 @@ class Manager:
         """
         try:
             if name is not None:
-                self.__global.config_dict["events"]["names"][index] = name
+                self.__global.config_dict["__events"]["names"][index] = name
             if time is not None:
-                self.__global.config_dict["events"]["times"][index] = time
+                self.__global.config_dict["__events"]["times"][index] = time
             return True, None
         except Exception as e:
             return False, e
